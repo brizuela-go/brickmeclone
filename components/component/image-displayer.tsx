@@ -44,6 +44,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 export function ImageDisplayer() {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -55,9 +57,10 @@ export function ImageDisplayer() {
   const [instructions, setInstructions] = useState<string | null>(null);
 
   const [piecesCount, setPiecesCount] = useState<number>(0);
-  const [panelSize, setPanelSize] = useState<number>(1);
+  const [panels, setPanels] = useState<number>(1);
   const [zoom, setZoom] = useState<number>(400);
   const [loading, setLoading] = useState<boolean>(false);
+  const [panelSize, setPanelSize] = useState<string>("32");
 
   const handleFileChange = (e: { target: { files: any[] } }) => {
     const file = e.target.files[0];
@@ -92,7 +95,7 @@ export function ImageDisplayer() {
       const response = await fetch(
         `http://127.0.0.1:8000/upload?image_url=${encodeURIComponent(
           imageUrl
-        )}&panel_size=${panelSize}&image_ext=${imageExt}`,
+        )}&panels=${panels}&image_ext=${imageExt}&panel_size=${panelSize}`,
         {
           method: "POST",
           headers: {
@@ -138,7 +141,8 @@ export function ImageDisplayer() {
     setPiecesTable(null);
     setPiecesCount(0);
     setImageURL(null);
-    setPanelSize(1);
+    setPanels(1);
+    setPanelSize("32");
     setZoom(400);
     setInstructions(null);
   };
@@ -222,6 +226,8 @@ export function ImageDisplayer() {
     };
   }, []);
 
+  console.log(panelSize);
+
   return (
     <div className="flex flex-col w-full min-h-screen overflow-hidden">
       <header className="flex items-center justify-between h-16 px-4 border-b shrink-0 md:px-6">
@@ -259,15 +265,30 @@ export function ImageDisplayer() {
               </span>
               <InfoIcon className="w-4 h-4 ml-auto" />
             </div>
+            <RadioGroup
+              className="flex justify-start space-x-2"
+              onValueChange={(value) => setPanelSize(value)}
+              defaultValue={panelSize}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="32" id="32" />
+                <Label htmlFor="32">32</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="50" id="50" />
+                <Label htmlFor="50">50</Label>
+              </div>
+            </RadioGroup>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <span>Paneles de 36</span>
+                <span>Paneles de {panelSize}</span>
                 <Input
                   type="number"
                   min={1}
                   max={10}
-                  value={panelSize}
-                  onChange={(e) => setPanelSize(Number(e.target.value))}
+                  value={panels}
+                  onChange={(e) => setPanels(Number(e.target.value))}
                   defaultValue={1}
                   className="w-16"
                 />
