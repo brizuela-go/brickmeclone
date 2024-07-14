@@ -232,11 +232,7 @@ export function ImageDisplayer() {
             <EyeIcon className="w-4 h-4 mr-2" />
             Vista Previa
           </Button>
-          <Button
-            onClick={handleUndo}
-            variant="ghost"
-            className="bg-gray-700 text-white"
-          >
+          <Button onClick={handleUndo} variant="outline">
             <UndoIcon className="w-4 h-4" />
           </Button>
         </div>
