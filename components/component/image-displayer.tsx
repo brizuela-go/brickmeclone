@@ -196,6 +196,10 @@ export function ImageDisplayer() {
                 `
                   )
                   .join("")}
+                <tr>
+                  <td>Total</td>
+                  <td>${piecesCount}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -222,13 +226,18 @@ export function ImageDisplayer() {
     <div className="flex flex-col w-full min-h-screen overflow-hidden">
       <header className="flex items-center justify-between h-16 px-4 border-b shrink-0 md:px-6">
         <div className="flex items-center gap-2">
-          <h1 className="text-lg font-bold">LEGO Creator</h1>
+          <NextImage src="/lego.png" alt="Lego Logo" width={40} height={40} />
+          <h1 className="text-lg font-bold">Creator</h1>
         </div>
         <h2 className="text-sm font-medium">
           Ajustes de imagen para mosaicos de LEGO
         </h2>
         <div className="flex items-center gap-4">
-          <Button variant="default" onClick={handleSubmit}>
+          <Button
+            variant="default"
+            disabled={!imageFile || loading}
+            onClick={handleSubmit}
+          >
             <EyeIcon className="w-4 h-4 mr-2" />
             Vista Previa
           </Button>
@@ -240,12 +249,13 @@ export function ImageDisplayer() {
       <section className="flex flex-1 p-4 md:p-10">
         <aside className="w-1/3 p-4 border-r">
           <div className="space-y-4">
-            <h3 className="text-lg font-bold">Tamaño, Forma y Recorte</h3>
+            <h3 className="text-lg font-bold">Tamaño y Forma</h3>
             <p className="text-sm text-muted-foreground">Ajuste</p>
             <div className="flex items-center gap-3">
               <LayoutGridIcon className="w-6 h-6" />
               <span>
-                Numero de piezas: <Badge className="ml-2">{piecesCount}</Badge>
+                Numero de piezas necesarias:{" "}
+                <Badge className="ml-2">{piecesCount}</Badge>
               </span>
               <InfoIcon className="w-4 h-4 ml-auto" />
             </div>
@@ -279,9 +289,8 @@ export function ImageDisplayer() {
           <div className="overflow-hidden">
             <Card className="w-full">
               <CardHeader>
-                <CardTitle>Mosaico de Legos</CardTitle>
                 <CardDescription className="flex items-center justify-center w-full h-80">
-                  {!mosaicImage || !imageURL ? (
+                  {!mosaicImage && !loading ? (
                     <span className="text-sm text-muted-foreground">
                       Sube una imagen para comenzar
                     </span>
@@ -299,7 +308,7 @@ export function ImageDisplayer() {
                     </div>
                   ) : (
                     <NextImage
-                      src={mosaicImage}
+                      src={mosaicImage ?? ""}
                       alt="Lego Mosaic"
                       width={zoom}
                       height={zoom}
@@ -374,6 +383,10 @@ export function ImageDisplayer() {
                                   </TableRow>
                                 )
                               )}
+                            <TableRow className="bg-[#f2f2f2]">
+                              <TableCell>Total</TableCell>
+                              <TableCell>{piecesCount}</TableCell>
+                            </TableRow>
                           </TableBody>
                         </Table>
                       </div>
