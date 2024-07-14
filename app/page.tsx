@@ -1,7 +1,6 @@
 import { ImageDisplayer } from "@/components/component/image-displayer";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
-import Image from "next/image";
 
 export default async function Home() {
   const user = await currentUser();
