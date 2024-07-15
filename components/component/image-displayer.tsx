@@ -286,7 +286,7 @@ export function ImageDisplayer() {
                 <Input
                   type="number"
                   min={1}
-                  max={10}
+                  max={35}
                   value={panels}
                   onChange={(e) => setPanels(Number(e.target.value))}
                   defaultValue={1}
