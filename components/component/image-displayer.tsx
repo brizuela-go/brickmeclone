@@ -53,7 +53,7 @@ export function ImageDisplayer() {
 
   const [piecesCount, setPiecesCount] = useState<number>(0);
   const [panels, setPanels] = useState<number>(1);
-  const [zoom, setZoom] = useState<number>(400);
+  const [zoom, setZoom] = useState<number>(300);
   const [loading, setLoading] = useState<boolean>(false);
   const [panelSize, setPanelSize] = useState<string>("32");
 
@@ -307,7 +307,7 @@ export function ImageDisplayer() {
           <div className="overflow-hidden">
             <Card className="w-full">
               <CardContent className="flex items-center justify-center w-full h-80">
-                <CardContainer>
+                <CardContainer className="w-full h-full">
                   {!mosaicImage && !loading ? (
                     <span className="text-sm text-muted-foreground">
                       Sube una imagen para comenzar
@@ -334,7 +334,7 @@ export function ImageDisplayer() {
                   )}
                 </CardContainer>
               </CardContent>
-              <CardFooter>
+              <CardFooter className="z-10">
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="icon" onClick={handleZoomIn}>
                     <PlusIcon className="w-4 h-4" />
