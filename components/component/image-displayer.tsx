@@ -15,6 +15,7 @@ import {
   Printer,
   ToyBrick,
   UndoIcon,
+  ImageDown,
 } from "lucide-react";
 import {
   Card,
@@ -261,7 +262,9 @@ export function ImageDisplayer() {
               <LayoutGridIcon className="w-6 h-6" />
               <span>
                 Numero de piezas necesarias:{" "}
-                <Badge className="ml-2">{piecesCount}</Badge>
+                <Badge className="ml-2">
+                  {piecesCount.toLocaleString("en-US")}
+                </Badge>
               </span>
               <InfoIcon className="w-4 h-4 ml-auto" />
             </div>
@@ -436,6 +439,19 @@ export function ImageDisplayer() {
                       />
                     </DialogContent>
                   </Dialog>
+                  <Button
+                    disabled={!mosaicImage || !imageURL}
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      const a = document.createElement("a");
+                      a.href = mosaicImage as string;
+                      a.download = "lego-mosaic.png";
+                      a.click();
+                    }}
+                  >
+                    <ImageDown className="w-4 h-4" />
+                  </Button>
                   <Button
                     disabled={!instructions}
                     variant="outline"
