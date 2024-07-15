@@ -17,14 +17,7 @@ import {
   UndoIcon,
   ImageDown,
 } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { default as NextImage } from "next/image";
 import {
   Dialog,
@@ -47,6 +40,7 @@ import {
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
 
 export function ImageDisplayer() {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -312,8 +306,8 @@ export function ImageDisplayer() {
         <div className="flex-1 px-4 w-full bg-[#FBFDFA]">
           <div className="overflow-hidden">
             <Card className="w-full">
-              <CardHeader>
-                <CardDescription className="flex items-center justify-center w-full h-80">
+              <CardContent className="flex items-center justify-center w-full h-80">
+                <CardContainer>
                   {!mosaicImage && !loading ? (
                     <span className="text-sm text-muted-foreground">
                       Sube una imagen para comenzar
@@ -338,8 +332,8 @@ export function ImageDisplayer() {
                       height={zoom}
                     />
                   )}
-                </CardDescription>
-              </CardHeader>
+                </CardContainer>
+              </CardContent>
               <CardFooter>
                 <div className="flex items-center gap-2">
                   <Button variant="outline" size="icon" onClick={handleZoomIn}>
