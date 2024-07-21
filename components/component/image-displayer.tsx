@@ -16,6 +16,7 @@ import {
   ToyBrick,
   UndoIcon,
   ImageDown,
+  ArrowUp10,
 } from "lucide-react";
 import {
   Card,
@@ -48,6 +49,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "../ui/slider";
 import Cropper, { type Area, Point } from "react-easy-crop";
 import getCroppedImg from "@/lib/utils";
+import { Toggle } from "../ui/toggle";
 
 export function ImageDisplayer() {
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -295,6 +297,8 @@ export function ImageDisplayer() {
     setPanels(width * height);
   }, [width, height]);
 
+  const [step, setStep] = useState<number>(0.1);
+
   return (
     <div className="flex flex-col w-full min-h-screen overflow-hidden">
       <header className="flex items-center justify-between h-16 px-4 border-b shrink-0 md:px-6">
@@ -360,14 +364,13 @@ export function ImageDisplayer() {
                       step={0.1}
                       onValueChange={(value) => setZoomCrop(value[0])}
                     />
-                    {/* width and height inputs for aspect ratio */}
                     <div className="flex items-center justify-start gap-4">
                       <div className="flex items-center gap-4">
                         <span>Ancho</span>
                         <Input
                           type="number"
                           min={1}
-                          step={0.1}
+                          step={step}
                           value={width}
                           onChange={(e) => setWidth(Number(e.target.value))}
                           className="w-16"
@@ -378,17 +381,29 @@ export function ImageDisplayer() {
                         <Input
                           type="number"
                           min={1}
-                          step={0.1}
+                          step={step}
                           value={height}
                           onChange={(e) => setHeight(Number(e.target.value))}
                           className="w-16"
                         />
                       </div>
+                      <Toggle
+                        onPressedChange={() => setStep(step === 1 ? 0.1 : 1)}
+                      >
+                        <ArrowUp10 className="w-4 h-4" />
+                      </Toggle>
                     </div>
                   </>
                 )}
               </>
             )}
+          </div>
+
+          <div className="mt-4 flex justify-between">
+            <div className="flex gap-4 justify-start items-start">
+              <p>Paneles: </p>
+              <Badge>{!imageFile ? 0 : panels.toFixed()}</Badge>
+            </div>
           </div>
           <div className="mt-4">
             <Input
