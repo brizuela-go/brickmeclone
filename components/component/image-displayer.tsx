@@ -366,7 +366,7 @@ export function ImageDisplayer() {
                       <div className="flex items-center gap-4">
                         <span>Ancho</span>
                         <Input
-                          type="number"
+                          type="tel"
                           min={1}
                           step={step}
                           value={width}
@@ -377,7 +377,7 @@ export function ImageDisplayer() {
                       <div className="flex items-center gap-4">
                         <span>Alto</span>
                         <Input
-                          type="number"
+                          type="tel"
                           min={1}
                           step={step}
                           value={height}
