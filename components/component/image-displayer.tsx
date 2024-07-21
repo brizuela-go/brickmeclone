@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,12 @@ import {
   UndoIcon,
   ImageDown,
 } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { default as NextImage } from "next/image";
 import {
   Dialog,
@@ -40,10 +45,13 @@ import {
 } from "@/components/ui/table";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CardBody, CardContainer, CardItem } from "../ui/3d-card";
+import { Slider } from "../ui/slider";
+import Cropper, { type Area, Point } from "react-easy-crop";
+import getCroppedImg from "@/lib/utils";
 
 export function ImageDisplayer() {
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [imageURL, setImageURL] = useState<string | null>(null);
   const [mosaicImage, setMosaicImage] = useState<string | null>(null);
   const [piecesTable, setPiecesTable] = useState<{ [key: string]: any } | null>(
@@ -57,16 +65,34 @@ export function ImageDisplayer() {
   const [loading, setLoading] = useState<boolean>(false);
   const [panelSize, setPanelSize] = useState<string>("32");
 
-  const handleFileChange = (e: { target: { files: any[] } }) => {
-    const file = e.target.files[0];
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMosaicImage(null);
+    setPiecesTable(null);
+    setInstructions(null);
+    setPiecesCount(0);
+    setImageURL(null);
+    setImagePreview(null);
+    setPanels(1);
+    setPanelSize("32");
+    setZoom(400);
+    setZoomCrop(1);
+    setWidth(1);
+    setHeight(1);
+    setCrop({ x: 0, y: 0 });
+    setCroppedAreaPixels(null);
+
+    const file = e.target.files?.[0];
     if (file) {
       setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      uploadImageToFirebase(file).then((url) => setImageURL(url));
     }
   };
 
-  const uploadImageToFirebase = async (file: File): Promise<string> => {
-    const storageRef = ref(storage, `images/${file.name}`);
-    await uploadBytes(storageRef, file);
+  // Function to upload the image to Firebase
+  const uploadImageToFirebase = async (image: File) => {
+    const storageRef = ref(storage, `images/${image.name}`);
+    await uploadBytes(storageRef, image);
     const url = await getDownloadURL(storageRef);
     return url;
   };
@@ -83,14 +109,20 @@ export function ImageDisplayer() {
     }
 
     try {
-      const imageUrl = await uploadImageToFirebase(imageFile);
-      setImageURL(imageUrl);
+      const croppedImage: any = await handleCrop(
+        imageURL as string,
+        croppedAreaPixels,
+        imageFile.name,
+        imageFile.type.split("/").pop() as string
+      );
+
+      const _imageURL = await uploadImageToFirebase(croppedImage as any);
       const imageExt = imageFile.name.split(".").pop();
 
       const response = await fetch(
         `http://127.0.0.1:8000/upload?image_url=${encodeURIComponent(
-          imageUrl
-        )}&panels=${panels}&image_ext=${imageExt}&panel_size=${panelSize}`,
+          _imageURL as unknown as string
+        )}&panels=${panels}&image_ext=${imageExt}&panel_size=${panelSize}&aspect_ratio=${width}/${height}`,
         {
           method: "POST",
           headers: {
@@ -131,15 +163,21 @@ export function ImageDisplayer() {
   };
 
   const handleUndo = () => {
-    setImageFile(null);
     setMosaicImage(null);
     setPiecesTable(null);
+    setInstructions(null);
     setPiecesCount(0);
     setImageURL(null);
+    setImagePreview(null);
     setPanels(1);
     setPanelSize("32");
     setZoom(400);
-    setInstructions(null);
+    setZoomCrop(1);
+    setWidth(1);
+    setHeight(1);
+    setCrop({ x: 0, y: 0 });
+    setCroppedAreaPixels(null);
+    setImageFile(null);
   };
 
   const handlePrint = () => {
@@ -221,7 +259,37 @@ export function ImageDisplayer() {
     };
   }, []);
 
-  console.log(panelSize);
+  const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
+  const [zoomCrop, setZoomCrop] = useState(1);
+  const [width, setWidth] = useState(1);
+  const [height, setHeight] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const onCropComplete = (
+    _croppedArea: any,
+    croppedAreaPixels: SetStateAction<null>
+  ) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const handleCrop = async (
+    url: string,
+    croppedAreaPixels: any,
+    name: string,
+    ext: string
+  ) => {
+    try {
+      const croppedImage = await getCroppedImg(
+        url,
+        croppedAreaPixels as any,
+        name,
+        ext as any
+      );
+      return croppedImage;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <div className="flex flex-col w-full min-h-screen overflow-hidden">
@@ -262,84 +330,143 @@ export function ImageDisplayer() {
               </span>
               <InfoIcon className="w-4 h-4 ml-auto" />
             </div>
-            <RadioGroup
-              className="flex justify-start space-x-2"
-              onValueChange={(value) => setPanelSize(value)}
-              defaultValue={panelSize}
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="32" id="32" />
-                <Label htmlFor="32">32</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="50" id="50" />
-                <Label htmlFor="50">50</Label>
-              </div>
-            </RadioGroup>
+            {!mosaicImage && (
+              <>
+                <RadioGroup
+                  className="flex justify-start space-x-2"
+                  onValueChange={(value) => setPanelSize(value)}
+                  defaultValue={panelSize}
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="32" id="32" />
+                    <Label htmlFor="32">32</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="50" id="50" />
+                    <Label htmlFor="50">50</Label>
+                  </div>
+                </RadioGroup>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span>Paneles de {panelSize}</span>
-                <Input
-                  type="number"
-                  min={1}
-                  max={35}
-                  value={panels}
-                  onChange={(e) => setPanels(Number(e.target.value))}
-                  defaultValue={1}
-                  className="w-16"
-                />
-              </div>
-            </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span>Paneles de {panelSize}</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      max={36}
+                      value={panels}
+                      onChange={(e) => setPanels(Number(e.target.value))}
+                      defaultValue={1}
+                      className="w-16"
+                    />
+                  </div>
+                </div>
+                {imagePreview && (
+                  <>
+                    <Slider
+                      value={[zoomCrop]}
+                      min={1}
+                      max={3}
+                      step={0.1}
+                      onValueChange={(value) => setZoomCrop(value[0])}
+                    />
+                    {/* width and height inputs for aspect ratio */}
+                    <div className="flex items-center justify-start gap-4">
+                      <div className="flex items-center gap-4">
+                        <span>Ancho</span>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={width}
+                          onChange={(e) => setWidth(Number(e.target.value))}
+                          className="w-16"
+                        />
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span>Alto</span>
+                        <Input
+                          type="number"
+                          min={1}
+                          value={height}
+                          onChange={(e) => setHeight(Number(e.target.value))}
+                          className="w-16"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
           <div className="mt-4">
             <Input
               type="file"
               placeholder="Subir imagen"
               accept=".png,.jpg,.jpeg"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleFileChange(e as any)
-              }
+              onChange={handleFileChange}
+              onClick={(e: any) => (e.target.value = "")}
             />
           </div>
         </aside>
         <div className="flex-1 px-4 w-full bg-[#FBFDFA]">
           <div className="overflow-hidden">
             <Card className="w-full">
-              <CardContent className="flex items-center justify-center w-full h-80">
-                <CardContainer className="w-full h-full">
-                  {!mosaicImage && !loading ? (
-                    <span className="text-sm text-muted-foreground">
-                      Sube una imagen para comenzar
-                    </span>
-                  ) : loading ? (
-                    <div className="flex items-center justify-center w-full h-80 flex-col gap-6">
-                      <NextImage
-                        src={"/building.webp"}
-                        width={300}
-                        height={300}
-                        alt="building"
+              <CardContent className="flex items-center justify-center w-full h-96">
+                {!mosaicImage && !loading && !imagePreview ? (
+                  <span className="text-sm text-muted-foregrounds">
+                    Sube una imagen para comenzar
+                  </span>
+                ) : imagePreview && !loading && !mosaicImage ? (
+                  <div className="cropper-container">
+                    {imagePreview && (
+                      <Cropper
+                        image={imagePreview}
+                        crop={crop}
+                        zoom={zoomCrop}
+                        aspect={width / height}
+                        onCropChange={setCrop}
+                        onCropComplete={onCropComplete as any}
+                        onZoomChange={setZoomCrop}
                       />
-                      <span className="text-sm text-muted-foreground">
-                        Creando mosaico...
-                      </span>
-                    </div>
-                  ) : (
+                    )}
+                  </div>
+                ) : loading ? (
+                  <div className="flex items-center justify-center w-full h-80 flex-col gap-6">
                     <NextImage
-                      src={mosaicImage ?? ""}
-                      alt="Lego Mosaic"
-                      width={zoom}
-                      height={zoom}
+                      src={"/building.webp"}
+                      width={300}
+                      height={300}
+                      alt="building"
                     />
-                  )}
-                </CardContainer>
+                    <span className="text-sm text-muted-foreground">
+                      Creando mosaico...
+                    </span>
+                  </div>
+                ) : (
+                  <NextImage
+                    src={mosaicImage ?? ""}
+                    alt="Lego Mosaic"
+                    width={zoom}
+                    height={zoom}
+                  />
+                )}
               </CardContent>
               <CardFooter className="z-10">
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="icon" onClick={handleZoomIn}>
+                  <Button
+                    disabled={!mosaicImage}
+                    variant="outline"
+                    size="icon"
+                    onClick={handleZoomIn}
+                  >
                     <PlusIcon className="w-4 h-4" />
                   </Button>
-                  <Button variant="outline" size="icon" onClick={handleZoomOut}>
+                  <Button
+                    disabled={!mosaicImage}
+                    variant="outline"
+                    size="icon"
+                    onClick={handleZoomOut}
+                  >
                     <MinusIcon className="w-4 h-4" />
                   </Button>
                   <Dialog>

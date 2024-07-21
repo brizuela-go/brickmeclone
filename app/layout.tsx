@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "react-easy-crop/react-easy-crop.css";
+
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 
