@@ -351,20 +351,6 @@ export function ImageDisplayer() {
                   </div>
                 </RadioGroup>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span>Paneles de {panelSize}</span>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={36}
-                      value={panels}
-                      onChange={(e) => setPanels(Number(e.target.value))}
-                      defaultValue={1}
-                      className="w-16"
-                    />
-                  </div>
-                </div>
                 {imagePreview && (
                   <>
                     <Slider
@@ -381,6 +367,7 @@ export function ImageDisplayer() {
                         <Input
                           type="number"
                           min={1}
+                          step={0.1}
                           value={width}
                           onChange={(e) => setWidth(Number(e.target.value))}
                           className="w-16"
@@ -391,6 +378,7 @@ export function ImageDisplayer() {
                         <Input
                           type="number"
                           min={1}
+                          step={0.1}
                           value={height}
                           onChange={(e) => setHeight(Number(e.target.value))}
                           className="w-16"
@@ -429,6 +417,8 @@ export function ImageDisplayer() {
                         zoom={zoomCrop}
                         aspect={width / height}
                         onCropChange={setCrop}
+                        showGrid={false}
+                        objectFit="contain"
                         onCropComplete={onCropComplete as any}
                         onZoomChange={setZoomCrop}
                       />
