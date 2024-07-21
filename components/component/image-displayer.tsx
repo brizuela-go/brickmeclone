@@ -338,23 +338,22 @@ export function ImageDisplayer() {
               </span>
               <InfoIcon className="w-4 h-4 ml-auto" />
             </div>
+            <RadioGroup
+              className="flex justify-start space-x-2"
+              onValueChange={(value) => setPanelSize(value)}
+              defaultValue={panelSize}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="32" id="32" />
+                <Label htmlFor="32">32</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="50" id="50" />
+                <Label htmlFor="50">50</Label>
+              </div>
+            </RadioGroup>
             {!mosaicImage && (
               <>
-                <RadioGroup
-                  className="flex justify-start space-x-2"
-                  onValueChange={(value) => setPanelSize(value)}
-                  defaultValue={panelSize}
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="32" id="32" />
-                    <Label htmlFor="32">32</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="50" id="50" />
-                    <Label htmlFor="50">50</Label>
-                  </div>
-                </RadioGroup>
-
                 {imagePreview && (
                   <>
                     <Slider
