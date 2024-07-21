@@ -75,7 +75,6 @@ export function ImageDisplayer() {
     setImageURL(null);
     setImagePreview(null);
     setPanels(1);
-    setPanelSize("32");
     setZoom(400);
     setZoomCrop(1);
     setWidth(1);
@@ -306,7 +305,7 @@ export function ImageDisplayer() {
           <NextImage src="/lego.png" alt="Lego Logo" width={40} height={40} />
           <h1 className="text-lg font-bold">Creator</h1>
         </div>
-        <h2 className="text-sm font-medium">
+        <h2 className="text-sm font-medium max-md:hidden">
           Ajustes de imagen para mosaicos de LEGO
         </h2>
         <div className="flex items-center gap-4">
@@ -323,8 +322,8 @@ export function ImageDisplayer() {
           </Button>
         </div>
       </header>
-      <section className="flex flex-1 p-4 md:p-10">
-        <aside className="w-1/3 p-4 border-r">
+      <section className="flex flex-1 p-4 md:p-10 max-md:flex-col-reverse max-md:gap-4">
+        <aside className="w-1/3 p-4 border-r max-md:w-full">
           <div className="space-y-4">
             <h3 className="text-lg font-bold">Tamaño y Forma</h3>
             <p className="text-sm text-muted-foreground">Ajuste</p>
@@ -461,7 +460,7 @@ export function ImageDisplayer() {
                 )}
               </CardContent>
               <CardFooter className="z-10">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 max-md:grid-cols-6 max-md:grid">
                   <Button
                     disabled={!mosaicImage}
                     variant="outline"
