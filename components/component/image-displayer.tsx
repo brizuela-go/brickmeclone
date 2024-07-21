@@ -387,6 +387,7 @@ export function ImageDisplayer() {
                         />
                       </div>
                       <Toggle
+                        pressed={step === 1}
                         onPressedChange={() => setStep(step === 1 ? 0.1 : 1)}
                       >
                         <ArrowUp10 className="w-4 h-4" />
