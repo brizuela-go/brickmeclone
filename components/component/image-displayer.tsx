@@ -291,6 +291,10 @@ export function ImageDisplayer() {
     }
   };
 
+  useEffect(() => {
+    setPanels(width * height);
+  }, [width, height]);
+
   return (
     <div className="flex flex-col w-full min-h-screen overflow-hidden">
       <header className="flex items-center justify-between h-16 px-4 border-b shrink-0 md:px-6">
