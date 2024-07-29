@@ -121,7 +121,7 @@ export function ImageDisplayer() {
       const imageExt = imageFile.name.split(".").pop();
 
       const response = await fetch(
-        `http://127.0.0.1:8000/upload?image_url=${encodeURIComponent(
+        `https://legos3-xvhymssjqa-uc.a.run.app/upload?image_url=${encodeURIComponent(
           _imageURL as unknown as string
         )}&panels=${panels}&image_ext=${imageExt}&panel_size=${panelSize}&aspect_ratio=${width}/${height}`,
         {
