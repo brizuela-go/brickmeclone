@@ -155,6 +155,8 @@ export function ImageDisplayer() {
     }
   };
 
+  // changes
+
   const handleZoomIn = () => {
     setZoom(zoom + 50);
   };
